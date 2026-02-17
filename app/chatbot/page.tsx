@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react"
-
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -20,18 +18,15 @@ const suggestedPrompts = [
 ];
 
 export default function ChatbotPage() {
-  const [input, setInput] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  const { messages, sendMessage, status, setMessages } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, append } = useChat({
+    api: "/api/chat",
   });
-
-  const isLoading = status === "streaming" || status === "submitted";
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,15 +50,11 @@ export default function ChatbotPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    sendMessage({ text: input });
-    setInput("");
-  };
-
   const handleSuggestedPrompt = (prompt: string) => {
-    sendMessage({ text: prompt });
+    append({
+      role: "user",
+      content: prompt,
+    });
   };
 
   const clearChat = () => {
@@ -152,16 +143,14 @@ export default function ChatbotPage() {
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex gap-4 ${
-                      message.role === "user" ? "flex-row-reverse" : ""
-                    }`}
+                    className={`flex gap-4 ${message.role === "user" ? "flex-row-reverse" : ""
+                      }`}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === "user"
-                          ? "bg-coral text-white"
-                          : "bg-muted"
-                      }`}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
+                        ? "bg-coral text-white"
+                        : "bg-muted"
+                        }`}
                     >
                       {message.role === "user" ? (
                         <User className="w-5 h-5" />
@@ -170,24 +159,17 @@ export default function ChatbotPage() {
                       )}
                     </div>
                     <div
-                      className={`flex-1 max-w-[80%] ${
-                        message.role === "user" ? "text-right" : ""
-                      }`}
+                      className={`flex-1 max-w-[80%] ${message.role === "user" ? "text-right" : ""
+                        }`}
                     >
                       <div
-                        className={`inline-block p-4 rounded-2xl ${
-                          message.role === "user"
-                            ? "bg-coral text-white"
-                            : "bg-muted text-foreground"
-                        }`}
+                        className={`inline-block p-4 rounded-2xl ${message.role === "user"
+                          ? "bg-coral text-white"
+                          : "bg-muted text-foreground"
+                          }`}
                       >
-                        <div className="whitespace-pre-wrap text-sm">
-                          {message.parts.map((part, index) => {
-                            if (part.type === "text") {
-                              return <span key={index}>{part.text}</span>;
-                            }
-                            return null;
-                          })}
+                        <div className="whitespace-pre-wrap text-sm text-left">
+                          {message.content}
                         </div>
                       </div>
                     </div>
@@ -227,7 +209,7 @@ export default function ChatbotPage() {
                 <input
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={handleInputChange}
                   placeholder="Ask me anything about your resume..."
                   className="w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-coral/50"
                   disabled={isLoading}

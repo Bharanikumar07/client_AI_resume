@@ -88,7 +88,7 @@ export default function ResumeBuilderPage() {
   const [newSkill, setNewSkill] = useState("");
   const [newCertification, setNewCertification] = useState("");
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   useEffect(() => {
     const loadSavedData = async () => {

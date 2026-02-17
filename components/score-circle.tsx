@@ -5,6 +5,7 @@ interface ScoreCircleProps {
     label?: string;
     size?: "sm" | "md" | "lg";
     className?: string;
+    animated?: boolean;
 }
 
 export function ScoreCircle({ score, label, size = "md", className }: ScoreCircleProps) {
