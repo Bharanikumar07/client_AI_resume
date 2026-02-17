@@ -1,0 +1,15 @@
+{
+  "/api/analyze/route": "app/api/analyze/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/chat/route": "app/api/chat/route.js",
+  "/analysis/[id]/page": "app/analysis/[id]/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/analysis/result/page": "app/analysis/result/page.js",
+  "/auth/error/page": "app/auth/error/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/auth/sign-up-success/page": "app/auth/sign-up-success/page.js",
+  "/page": "app/page.js",
+  "/auth/sign-up/page": "app/auth/sign-up/page.js",
+  "/chatbot/page": "app/chatbot/page.js",
+  "/resume-builder/page": "app/resume-builder/page.js"
+}
